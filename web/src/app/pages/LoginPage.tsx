@@ -86,6 +86,16 @@ export function LoginPage() {
               >
                 {isLoading ? "Signing in..." : "Sign In"}
               </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={() => {
+                  window.location.href = "http://localhost:8080/oauth2/authorization/google";
+                }}
+              >
+                Continue with Google
+              </Button>
               <div className="text-sm text-center text-gray-600">
                 Don't have an account?{" "}
                 <Link 
