@@ -6,6 +6,7 @@ public class SearchRequest {
     private double lng;
     private double radiusInKm;
     private String priceRange;
+    private String sortBy;
     private int page;
     private int size;
 
@@ -24,6 +25,9 @@ public class SearchRequest {
 
     public String getPriceRange() { return priceRange; }
     public void setPriceRange(String priceRange) { this.priceRange = priceRange; }
+
+    public String getSortBy() { return sortBy; }
+    public void setSortBy(String sortBy) { this.sortBy = sortBy; }
 
     public int getPage() { return page; }
     public void setPage(int page) { this.page = page; }

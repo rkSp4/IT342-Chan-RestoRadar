@@ -53,18 +53,23 @@ public class RestaurantEntity {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    @Transient
+    private Double distance; // Transient field for computing distance on the fly
+
     public void setName(String name) { this.name = name; }
     public void setAddress(String address) { this.address = address; }
     public void setLatitude(Double latitude) { this.latitude = latitude; }
     public void setLongitude(Double longitude) { this.longitude = longitude; }
     public void setAverageRating(Double averageRating) { this.averageRating = averageRating; }
     public void setReviewCount(Integer reviewCount) { this.reviewCount = reviewCount; }
+    public void setDistance(Double distance) { this.distance = distance; }
     
     public Double getLatitude() { return latitude; }
     public Double getLongitude() { return longitude; }
     public Double getAverageRating() { return averageRating; }
     public Integer getReviewCount() { return reviewCount; }
     public String getName() { return name; }
+    public Double getDistance() { return distance; }
 
     // Default constructor for framework requirement
     public RestaurantEntity() {}

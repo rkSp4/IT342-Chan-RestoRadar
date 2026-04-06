@@ -4,6 +4,8 @@ import edu.cit.chan.restoradar.dto.SearchRequest;
 import edu.cit.chan.restoradar.entity.RestaurantEntity;
 import edu.cit.chan.restoradar.repository.RestaurantRepository;
 import edu.cit.chan.restoradar.service.MapService;
+import edu.cit.chan.restoradar.strategy.SortStrategy;
+import edu.cit.chan.restoradar.strategy.SortStrategyFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,10 +22,14 @@ public class RestaurantSearchFacade {
 
     private final MapService mapService;
     private final RestaurantRepository restaurantRepository;
+    private final SortStrategyFactory sortStrategyFactory;
 
-    public RestaurantSearchFacade(MapService mapService, RestaurantRepository restaurantRepository) {
+    public RestaurantSearchFacade(MapService mapService, 
+                                  RestaurantRepository restaurantRepository,
+                                  SortStrategyFactory sortStrategyFactory) {
         this.mapService = mapService;
         this.restaurantRepository = restaurantRepository;
+        this.sortStrategyFactory = sortStrategyFactory;
     }
 
     /**
@@ -56,16 +62,27 @@ public class RestaurantSearchFacade {
         }
 
         // 4. Combine subsystems, apply price-range processing / compute ratings
-        // A naive aggregation logic for the demo: merge and filter out things out of bounds
+        // Calculate distance and filter out out-of-bounds entities
         List<RestaurantEntity> results = dbEntities.stream()
-                .filter(entity -> calculateDistance(request.getLat(), request.getLng(), entity.getLatitude(), entity.getLongitude()) <= request.getRadiusInKm())
+                .peek(entity -> {
+                    double distance = calculateDistance(request.getLat(), request.getLng(), entity.getLatitude(), entity.getLongitude());
+                    entity.setDistance(distance);
+                })
+                .filter(entity -> entity.getDistance() <= request.getRadiusInKm())
                 .collect(Collectors.toList());
         
+        // Similarly prep Map entities (assuming distance is already valid)
+        nearbyFromMap.forEach(entity -> {
+            double distance = calculateDistance(request.getLat(), request.getLng(), entity.getLatitude(), entity.getLongitude());
+            entity.setDistance(distance);
+        });
         results.addAll(nearbyFromMap);
 
-        // 5. Calculate average ratings + Pagination (Mocked here by simply returning a slice)
-        // E.g., assign computed scores: result.setAverageRating( ratingCalculator.getAverageFor(result) )
+        // 5. Setup Sort Strategy automatically resolving 'top-rated', 'nearest', 'most-reviewed'
+        SortStrategy sortStrategy = sortStrategyFactory.getStrategy(request.getSortBy());
+        sortStrategy.sort(results);
 
+        // 6. Calculate average ratings + Pagination (Mocked here by simply returning a slice)
         return applyPagination(results, request.getPage(), request.getSize());
     }
 
