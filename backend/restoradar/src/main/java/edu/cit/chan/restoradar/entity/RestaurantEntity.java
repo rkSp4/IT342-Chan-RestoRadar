@@ -40,6 +40,12 @@ public class RestaurantEntity {
     private String cuisineType;
     private String priceRange;
     private String photos;
+    
+    @Column(nullable = false)
+    private Double averageRating = 0.0;
+    
+    @Column(nullable = false)
+    private Integer reviewCount = 0;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -51,9 +57,14 @@ public class RestaurantEntity {
     public void setAddress(String address) { this.address = address; }
     public void setLatitude(Double latitude) { this.latitude = latitude; }
     public void setLongitude(Double longitude) { this.longitude = longitude; }
+    public void setAverageRating(Double averageRating) { this.averageRating = averageRating; }
+    public void setReviewCount(Integer reviewCount) { this.reviewCount = reviewCount; }
     
     public Double getLatitude() { return latitude; }
     public Double getLongitude() { return longitude; }
+    public Double getAverageRating() { return averageRating; }
+    public Integer getReviewCount() { return reviewCount; }
+    public String getName() { return name; }
 
     // Default constructor for framework requirement
     public RestaurantEntity() {}
