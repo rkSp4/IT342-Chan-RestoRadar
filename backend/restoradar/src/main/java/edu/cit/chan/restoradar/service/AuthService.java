@@ -3,10 +3,12 @@ package edu.cit.chan.restoradar.service;
 import edu.cit.chan.restoradar.dto.LoginRequest;
 import edu.cit.chan.restoradar.dto.RegistrationRequest;
 import edu.cit.chan.restoradar.entity.RefreshTokenEntity;
+import edu.cit.chan.restoradar.entity.Role;
 import edu.cit.chan.restoradar.entity.UserEntity;
 import edu.cit.chan.restoradar.exception.DuplicateEmailException;
 import edu.cit.chan.restoradar.exception.InvalidCredentialsException;
 import edu.cit.chan.restoradar.exception.TokenRefreshException;
+import edu.cit.chan.restoradar.factory.UserFactory;
 import edu.cit.chan.restoradar.repository.RefreshTokenRepository;
 import edu.cit.chan.restoradar.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +26,7 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final UserFactory userFactory;
 
     @Value("${jwt.refresh.expiration}")
     private Long refreshExpiration; // in milliseconds
@@ -31,11 +34,13 @@ public class AuthService {
     public AuthService(UserRepository userRepository,
                        RefreshTokenRepository refreshTokenRepository,
                        PasswordEncoder passwordEncoder,
-                       JwtService jwtService) {
+                       JwtService jwtService,
+                       UserFactory userFactory) {
         this.userRepository = userRepository;
         this.refreshTokenRepository = refreshTokenRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.userFactory = userFactory;
     }
 
     @Transactional
@@ -50,12 +55,21 @@ public class AuthService {
             throw new IllegalArgumentException("Passwords do not match");
         }
 
-        // Create user
-        UserEntity user = new UserEntity();
+        // Determine user role from request or default to USER
+        Role role = Role.USER;
+        if (request.getRole() != null) {
+            try {
+                role = Role.valueOf(request.getRole().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                // Ignore and use default USER
+            }
+        }
+
+        // Create user using Factory Method
+        UserEntity user = userFactory.createUser(role);
         user.setFullName(request.getFullName());
         user.setEmail(request.getEmail());
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-        user.setRole("USER");
 
         return userRepository.save(user);
     }

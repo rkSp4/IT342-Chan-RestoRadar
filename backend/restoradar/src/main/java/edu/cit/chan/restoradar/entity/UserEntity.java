@@ -8,7 +8,9 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "users")
-public class UserEntity {
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "role", discriminatorType = DiscriminatorType.STRING)
+public abstract class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -24,8 +26,8 @@ public class UserEntity {
 
     private String profileImage;
 
-    @Column(nullable = false)
-    private String role = "USER";
+    @Column(name = "role", insertable = false, updatable = false)
+    private String role;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
