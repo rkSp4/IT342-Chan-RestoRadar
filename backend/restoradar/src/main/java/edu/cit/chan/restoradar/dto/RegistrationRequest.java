@@ -22,13 +22,16 @@ public class RegistrationRequest {
     @NotBlank(message = "Confirm password is required")
     private String confirmPassword;
 
+    private String role;
+
     public RegistrationRequest() {}
 
-    public RegistrationRequest(String fullName, String email, String password, String confirmPassword) {
+    public RegistrationRequest(String fullName, String email, String password, String confirmPassword, String role) {
         this.fullName = fullName;
         this.email = email;
         this.password = password;
         this.confirmPassword = confirmPassword;
+        this.role = role;
     }
 
     public String getFullName() { return fullName; }
@@ -42,4 +45,7 @@ public class RegistrationRequest {
 
     public String getConfirmPassword() { return confirmPassword; }
     public void setConfirmPassword(String confirmPassword) { this.confirmPassword = confirmPassword; }
+
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
 }
