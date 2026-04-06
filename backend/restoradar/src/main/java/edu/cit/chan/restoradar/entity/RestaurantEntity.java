@@ -13,10 +13,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "restaurants")
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+// @Data, @Builder temporarily omitted pending fully resolving Lombok environment setup
 public class RestaurantEntity {
 
     @Id
@@ -49,4 +46,12 @@ public class RestaurantEntity {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    public void setName(String name) { this.name = name; }
+    public void setAddress(String address) { this.address = address; }
+    public void setLatitude(Double latitude) { this.latitude = latitude; }
+    public void setLongitude(Double longitude) { this.longitude = longitude; }
+    
+    // Default constructor for framework requirement
+    public RestaurantEntity() {}
 }
