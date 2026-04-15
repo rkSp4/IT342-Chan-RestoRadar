@@ -18,7 +18,7 @@ export function RestaurantDetailPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-2">Restaurant not found</h2>
-          <Link to="/">
+          <Link to="/explore">
             <Button>Back to Explore</Button>
           </Link>
         </div>
@@ -38,7 +38,7 @@ export function RestaurantDetailPage() {
           className="w-full h-full object-cover"
         />
         <div className="absolute top-4 left-4">
-          <Link to="/">
+          <Link to="/explore">
             <Button variant="secondary" size="icon" className="rounded-full">
               <ArrowLeft size={20} />
             </Button>

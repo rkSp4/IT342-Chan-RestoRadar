@@ -5,7 +5,7 @@ export function MobileBottomNav() {
   const location = useLocation();
   
   const navItems = [
-    { icon: Home, label: "Explore", path: "/" },
+    { icon: Home, label: "Explore", path: "/explore" },
     { icon: Map, label: "Map", path: "/map" },
     { icon: Heart, label: "Favorites", path: "/favorites" },
     { icon: User, label: "Profile", path: "/profile" }

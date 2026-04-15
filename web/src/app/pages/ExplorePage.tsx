@@ -9,7 +9,9 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "../c
 import { useRootContext } from "../Root";
 
 export function ExplorePage() {
-  const { favorites, onToggleFavorite } = useRootContext();
+  const rootContext = useRootContext();
+  if (!rootContext) return null;
+  const { favorites, onToggleFavorite } = rootContext;
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCuisine, setSelectedCuisine] = useState("All");
   const [selectedPriceRange, setSelectedPriceRange] = useState("All");

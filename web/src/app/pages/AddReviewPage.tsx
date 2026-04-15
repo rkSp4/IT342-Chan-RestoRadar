@@ -19,7 +19,7 @@ export function AddReviewPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-2">Restaurant not found</h2>
-          <Link to="/">
+          <Link to="/explore">
             <Button>Back to Explore</Button>
           </Link>
         </div>
@@ -27,7 +27,7 @@ export function AddReviewPage() {
     );
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (rating === 0) {
@@ -40,9 +40,26 @@ export function AddReviewPage() {
       return;
     }
 
-    // In a real app, this would submit to the backend
-    toast.success("Review submitted successfully!");
-    navigate(`/restaurant/${id}`);
+    try {
+      const response = await fetch(`/api/v1/restaurants/${id}/reviews`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("restoradar_access_token")}`
+        },
+        body: JSON.stringify({ score: rating, comment: comment })
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to submit review");
+      }
+
+      toast.success("Review submitted successfully!");
+      navigate(`/restaurant/${id}`);
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      toast.error("Failed to submit review. Please try again later.");
+    }
   };
 
   return (

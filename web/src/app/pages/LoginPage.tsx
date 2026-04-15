@@ -22,7 +22,15 @@ export function LoginPage() {
 
     const result = await login(email, password);
     if (result.success) {
-      navigate("/home", { state: { justRegistered: false } });
+      // copy tokens/user set by AuthContext into the simple keys some parts expect
+      const access = localStorage.getItem("restoradar_access_token");
+      const refresh = localStorage.getItem("restoradar_refresh_token");
+      const userStr = localStorage.getItem("restoradar_user");
+      if (access) localStorage.setItem("token", access);
+      if (refresh) localStorage.setItem("refreshToken", refresh);
+      if (userStr) localStorage.setItem("user", userStr);
+
+      navigate("/explore", { state: { justRegistered: false } });
     } else {
       setError(result.error || "Invalid email or password.");
     }

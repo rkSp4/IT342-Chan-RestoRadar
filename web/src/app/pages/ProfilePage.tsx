@@ -158,7 +158,7 @@ export function ProfilePage() {
             <div className="text-center py-8 text-gray-500">
               <MessageSquare size={48} className="mx-auto mb-4 text-gray-300" />
               <p>You haven't written any reviews yet</p>
-              <Link to="/">
+              <Link to="/explore">
                 <Button className="mt-4">Explore Restaurants</Button>
               </Link>
             </div>

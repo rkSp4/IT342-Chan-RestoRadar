@@ -1,4 +1,4 @@
-import { Review } from "../types/restaurant";
+import type { Review } from "../types/restaurant";
 import { StarRating } from "./StarRating";
 
 interface ReviewCardProps {
