@@ -1,5 +1,5 @@
 import { Heart, MapPin, Clock } from "lucide-react";
-import { Restaurant } from "../types/restaurant";
+import type { Restaurant } from "../types/restaurant";
 import { StarRating } from "./StarRating";
 import { Link } from "react-router";
 import { ImageWithFallback } from "./figma/ImageWithFallback";

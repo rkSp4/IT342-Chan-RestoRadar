@@ -19,7 +19,7 @@ export function MobileHeader() {
   return (
     <header className="lg:hidden sticky top-0 z-50 bg-white border-b border-gray-200 px-4 py-3">
       <div className="flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
+        <Link to="/explore" className="flex items-center gap-2">
           <div className="bg-orange-500 p-1.5 rounded-lg">
             <svg className="size-5 text-white" fill="currentColor" viewBox="0 0 20 20">
               <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6z" />

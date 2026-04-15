@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { Button } from "../components/ui/button";
 import {
@@ -34,7 +36,7 @@ export function WelcomeDialog() {
             <div className="bg-orange-500 p-2 rounded-lg">
               <ChefHat className="size-6 text-white" />
             </div>
-            Welcome to FoodSpot!
+            Welcome to RestoRadar!
           </DialogTitle>
           <DialogDescription className="text-base">
             Your complete food discovery and management platform

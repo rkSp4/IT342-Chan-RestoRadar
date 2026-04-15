@@ -9,7 +9,7 @@ export function Sidebar() {
   const navigate = useNavigate();
   
   const navItems = [
-    { icon: Home, label: "Explore", path: "/" },
+    { icon: Home, label: "Explore", path: "/explore" },
     { icon: Map, label: "Map View", path: "/map" },
     { icon: Heart, label: "Favorites", path: "/favorites" },
     { icon: User, label: "Profile", path: "/profile" }
@@ -17,13 +17,13 @@ export function Sidebar() {
 
   const handleLogout = () => {
     logout();
-    navigate("/");
+    navigate("/explore");
   };
   
   return (
     <aside className="hidden md:flex md:flex-col w-64 bg-white border-r border-gray-200 h-screen sticky top-0">
       <div className="p-6 border-b border-gray-200">
-        <Link to="/" className="flex items-center gap-2">
+        <Link to="/explore" className="flex items-center gap-2">
           <div className="bg-gradient-to-br from-orange-500 to-red-500 p-2 rounded-lg">
             <Utensils className="text-white" size={24} />
           </div>

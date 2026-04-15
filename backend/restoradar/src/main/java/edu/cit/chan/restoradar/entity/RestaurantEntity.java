@@ -57,6 +57,7 @@ public class RestaurantEntity {
     private Double distance; // Transient field for computing distance on the fly
 
     public void setName(String name) { this.name = name; }
+    public void setId(UUID id) { this.id = id; }
     public void setAddress(String address) { this.address = address; }
     public void setLatitude(Double latitude) { this.latitude = latitude; }
     public void setLongitude(Double longitude) { this.longitude = longitude; }

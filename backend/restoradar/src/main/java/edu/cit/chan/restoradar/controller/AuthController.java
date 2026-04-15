@@ -69,8 +69,7 @@ public class AuthController {
         }
     }
 
-    private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String code,
-                                                              String message, Object details) {
+    private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String code, String message, Object details) {
         ErrorResponse.ErrorDetail errorDetail = new ErrorResponse.ErrorDetail(code, message, details);
         ErrorResponse response = new ErrorResponse(false, null, errorDetail, Instant.now());
         return ResponseEntity.status(status).body(response);
