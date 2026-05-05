@@ -1,10 +1,7 @@
-package com.chan.restoradar.ui.auth
+package com.chan.restoradar.feature.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.chan.restoradar.data.models.AuthData
-import com.chan.restoradar.data.repository.AuthRepository
-import com.chan.restoradar.data.repository.AuthResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch

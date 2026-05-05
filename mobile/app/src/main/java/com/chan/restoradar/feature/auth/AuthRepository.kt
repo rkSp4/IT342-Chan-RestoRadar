@@ -1,9 +1,6 @@
-package com.chan.restoradar.data.repository
+package com.chan.restoradar.feature.auth
 
-import com.chan.restoradar.data.models.AuthData
-import com.chan.restoradar.data.models.LoginRequest
-import com.chan.restoradar.data.models.RegisterRequest
-import com.chan.restoradar.data.network.RetrofitClient
+import com.chan.restoradar.shared.network.RetrofitClient
 
 sealed class AuthResult<out T> {
     data class Success<T>(val data: T) : AuthResult<T>()

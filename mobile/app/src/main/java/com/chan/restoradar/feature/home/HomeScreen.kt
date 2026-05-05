@@ -1,4 +1,4 @@
-package com.chan.restoradar.ui.home
+package com.chan.restoradar.feature.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
