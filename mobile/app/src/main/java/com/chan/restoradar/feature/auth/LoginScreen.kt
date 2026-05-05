@@ -1,4 +1,4 @@
-package com.chan.restoradar.ui.auth
+package com.chan.restoradar.feature.auth
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

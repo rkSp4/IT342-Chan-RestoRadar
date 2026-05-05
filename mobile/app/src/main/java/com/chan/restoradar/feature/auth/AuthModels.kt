@@ -1,4 +1,4 @@
-package com.chan.restoradar.data.models
+package com.chan.restoradar.feature.auth
 
 import com.google.gson.annotations.SerializedName
 

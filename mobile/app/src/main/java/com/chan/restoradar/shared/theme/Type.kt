@@ -1,4 +1,4 @@
-package com.chan.restoradar.ui.theme
+package com.chan.restoradar.shared.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

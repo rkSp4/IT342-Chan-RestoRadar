@@ -7,9 +7,9 @@ import androidx.compose.runtime.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.chan.restoradar.ui.auth.LoginScreen
-import com.chan.restoradar.ui.auth.RegisterScreen
-import com.chan.restoradar.ui.home.HomeScreen
+import com.chan.restoradar.feature.auth.LoginScreen
+import com.chan.restoradar.feature.auth.RegisterScreen
+import com.chan.restoradar.feature.home.HomeScreen
 
 object Routes {
     const val LOGIN    = "login"

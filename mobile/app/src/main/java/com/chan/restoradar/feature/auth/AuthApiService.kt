@@ -1,8 +1,8 @@
-package com.chan.restoradar.data.network
+package com.chan.restoradar.feature.auth
 
-import com.chan.restoradar.data.models.AuthResponse
-import com.chan.restoradar.data.models.LoginRequest
-import com.chan.restoradar.data.models.RegisterRequest
+import com.chan.restoradar.feature.auth.AuthResponse
+import com.chan.restoradar.feature.auth.LoginRequest
+import com.chan.restoradar.feature.auth.RegisterRequest
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST

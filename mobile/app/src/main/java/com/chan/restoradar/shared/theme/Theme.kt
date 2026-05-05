@@ -1,4 +1,4 @@
-package com.chan.restoradar.ui.theme
+package com.chan.restoradar.shared.theme
 
 import android.app.Activity
 import android.os.Build
