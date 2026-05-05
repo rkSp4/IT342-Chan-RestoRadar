@@ -18,7 +18,7 @@ public class OwnerNotifyingListener {
 
         System.out.println("OBSERVER TRIGGERED: Sending email/push notification to Owner -> " 
                            + " Your restaurant " + restaurant.getName() 
-                           + " received a new " + event.getReview().getScore() + "-star review!");
+                           + " received a new " + event.getReview().getrating() + "-star review!");
         
         // This is where external Push Notification Service logic would run.
     }

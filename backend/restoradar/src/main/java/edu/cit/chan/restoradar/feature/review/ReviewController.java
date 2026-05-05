@@ -35,7 +35,7 @@ public class ReviewController {
                 }
             }
 
-            ReviewEntity review = reviewService.submitReview(restaurantId, request.getScore(), request.getComment());
+            ReviewEntity review = reviewService.submitReview(restaurantId, request.getrating(), request.getComment());
             return ResponseEntity.ok(Map.of(
                 "success", true,
                 "message", "Review submitted successfully",

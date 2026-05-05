@@ -31,7 +31,7 @@ public class RatingCalculatorListener {
         double currentAverage = restaurant.getAverageRating() == null ? 0.0 : restaurant.getAverageRating();
         
         // Simple moving average calculation logic
-        double newTotal = (currentAverage * currentCount) + createdReview.getScore();
+        double newTotal = (currentAverage * currentCount) + createdReview.getrating();
         int newCount = currentCount + 1;
         double newAverage = newTotal / newCount;
         
