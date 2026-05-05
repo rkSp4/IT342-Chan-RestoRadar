@@ -21,7 +21,7 @@ public class ReviewEntity {
     private RestaurantEntity restaurant;
 
     @Column(nullable = false)
-    private int score; // e.g. 1 to 5
+    private int rating; // e.g. 1 to 5
 
     @Column(columnDefinition = "TEXT")
     private String comment;
@@ -31,9 +31,9 @@ public class ReviewEntity {
     
     public ReviewEntity() {}
 
-    public ReviewEntity(RestaurantEntity restaurant, int score, String comment) {
+    public ReviewEntity(RestaurantEntity restaurant, int rating, String comment) {
         this.restaurant = restaurant;
-        this.score = score;
+        this.rating = rating;
         this.comment = comment;
     }
 
@@ -43,8 +43,8 @@ public class ReviewEntity {
     public RestaurantEntity getRestaurant() { return restaurant; }
     public void setRestaurant(RestaurantEntity restaurant) { this.restaurant = restaurant; }
 
-    public int getScore() { return score; }
-    public void setScore(int score) { this.score = score; }
+    public int getrating() { return rating; }
+    public void setrating(int rating) { this.rating = rating; }
 
     public String getComment() { return comment; }
     public void setComment(String comment) { this.comment = comment; }

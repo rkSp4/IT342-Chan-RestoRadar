@@ -28,7 +28,7 @@ public class ReviewService {
      * Submit a new review and trigger the Observer pattern events immediately!
      */
     @Transactional
-    public ReviewEntity submitReview(UUID restaurantId, int score, String comment) {
+    public ReviewEntity submitReview(UUID restaurantId, int rating, String comment) {
         RestaurantEntity restaurant = restaurantRepository.findById(restaurantId)
                 .orElseGet(() -> {
                     RestaurantEntity dummy = new RestaurantEntity();
@@ -39,7 +39,7 @@ public class ReviewService {
                     return restaurantRepository.save(dummy);
                 });
 
-        ReviewEntity review = new ReviewEntity(restaurant, score, comment);
+        ReviewEntity review = new ReviewEntity(restaurant, rating, comment);
         review = reviewRepository.save(review);
 
         // Subject notifies all interested Observers

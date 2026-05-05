@@ -1,21 +1,21 @@
 package edu.cit.chan.restoradar.feature.review;
 
 public class ReviewRequest {
-    private int score;
+    private int rating;
     private String comment;
 
     public ReviewRequest() {}
 
-    public ReviewRequest(int score, String comment) {
-        this.score = score;
+    public ReviewRequest(int rating, String comment) {
+        this.rating = rating;
         this.comment = comment;
     }
 
-    public int getScore() {
-        return score;
+    public int getrating() {
+        return rating;
     }
-    public void setScore(int score) {
-        this.score = score;
+    public void setrating(int rating) {
+        this.rating = rating;
     }
 
     public String getComment() {

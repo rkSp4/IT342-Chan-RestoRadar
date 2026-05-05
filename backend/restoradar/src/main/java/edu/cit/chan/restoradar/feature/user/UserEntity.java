@@ -3,6 +3,9 @@ package edu.cit.chan.restoradar.feature.user;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -22,6 +25,7 @@ public abstract class UserEntity {
     private String email;
 
     @Column(nullable = false)
+    @JsonIgnore
     private String passwordHash;
 
     private String profileImage;
