@@ -49,6 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       const data = await response.json();
+      console.log("Full login response:", data);
 
       if (!response.ok) {
         return { success: false, error: data.error?.message || "Invalid email or password" };
@@ -93,6 +94,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     setUser(null);
+    localStorage.removeItem("restoradar_access_token");
+    localStorage.removeItem("restoradar_refresh_token");
+    localStorage.removeItem("restoradar_user");
   };
 
   const updateProfile = (updates: Partial<User>) => {
