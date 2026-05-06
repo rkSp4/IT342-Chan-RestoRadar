@@ -47,7 +47,7 @@ export function AddReviewPage() {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${localStorage.getItem("restoradar_access_token")}`
         },
-        body: JSON.stringify({ score: rating, comment: comment })
+        body: JSON.stringify({ rating: rating, comment: comment })
       });
 
       if (!response.ok) {
