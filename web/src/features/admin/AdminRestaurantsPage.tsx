@@ -21,8 +21,8 @@ import {
 } from "../../shared/components/ui/dialog";
 import { Label } from "../../shared/components/ui/label";
 import { Textarea } from "../../shared/components/ui/textarea";
-import { mockRestaurants } from "../../data/mockData";
-import { Restaurant } from "../restaurant/restaurant";
+import { mockRestaurants } from "../restaurant/mockData";
+import { type Restaurant } from "../restaurant/restaurant";
 import { Plus, Search, Edit, Trash2, Star, MapPin } from "lucide-react";
 import { toast } from "sonner";
 

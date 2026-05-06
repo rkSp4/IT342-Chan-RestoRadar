@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router";
 import { useAuth } from "./AuthContext";
 import { Button } from "../../shared/components/ui/button";
@@ -14,8 +14,14 @@ export function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { register } = useAuth();
+  const { register, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/explore", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const validateForm = () => {
     if (name.length < 2) {
@@ -57,7 +63,7 @@ export function RegisterPage() {
 
     const result = await register(name, email, password, confirmPassword);
     if (result.success) {
-      navigate("/home", { state: { justRegistered: true, name } });
+      navigate("/home", { state: { justRegistered: true, name }, replace: true });
     } else {
       setError(result.error || "An account with this email already exists");
     }

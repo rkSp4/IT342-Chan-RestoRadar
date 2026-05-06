@@ -18,8 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../shared/components/ui/select";
-import { mockReviews, mockRestaurants } from "../../data/mockData";
-import { Review } from "../restaurant/restaurant";
+import { mockReviews, mockRestaurants } from "../restaurant/mockData";
+import { type Review } from "../restaurant/restaurant";
 import { Search, Trash2, Star, CheckCircle, XCircle } from "lucide-react";
 import { toast } from "sonner";
 

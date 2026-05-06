@@ -11,24 +11,29 @@ import { MapPage } from "./features/restaurant/MapPage";
 import { AddReviewPage } from "./features/review/AddReviewPage";
 import { ProfilePage } from "./features/user/ProfilePage";
 import { HelpPage } from "./features/help/HelpPage";
+import { AdminProvider } from "./features/admin/AdminContext";
+import { AdminLayout } from "./features/admin/AdminLayout";
+import { AdminLoginPage } from "./features/admin/AdminLoginPage";
+import { AdminDashboardPage } from "./features/admin/AdminDashboardPage";
+import { AdminUsersPage } from "./features/admin/AdminUsersPage";
+import { AdminRestaurantsPage } from "./features/admin/AdminRestaurantsPage";
+import { AdminReviewsPage } from "./features/admin/AdminReviewsPage";
+import { AdminAnalyticsPage } from "./features/admin/AdminAnalyticsPage";
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <Navigate to="/explore" replace />,
-  },
-  {
-    path: "/",
     element: <Root />,
     children: [
-      { path: "/home", element: <HomePage /> },
-      { path: "/explore", element: <ExplorePage /> },
-      { path: "/restaurant/:id", element: <RestaurantDetailPage /> },
-      { path: "/favorites", element: <FavoritesPage /> },
-      { path: "/map", element: <MapPage /> },
-      { path: "/restaurant/:id/review", element: <AddReviewPage /> },
-      { path: "/profile", element: <ProfilePage /> },
-      { path: "/help", element: <HelpPage /> },
+      { index: true, element: <Navigate to="/login" replace /> },
+      { path: "home", element: <HomePage /> },
+      { path: "explore", element: <ExplorePage /> },
+      { path: "restaurant/:id", element: <RestaurantDetailPage /> },
+      { path: "favorites", element: <FavoritesPage /> },
+      { path: "map", element: <MapPage /> },
+      { path: "restaurant/:id/review", element: <AddReviewPage /> },
+      { path: "profile", element: <ProfilePage /> },
+      { path: "help", element: <HelpPage /> },
     ],
   },
   {
@@ -42,5 +47,29 @@ export const router = createBrowserRouter([
   {
     path: "/oauth/callback",
     element: <OAuthCallbackPage />,
+  },
+  {
+  path: "/admin/login",
+  element: (
+    <AdminProvider>
+      <AdminLoginPage />
+    </AdminProvider>
+  ),
+  },
+  {
+    path: "/admin",
+    element: (
+      <AdminProvider>
+        <AdminLayout />
+      </AdminProvider>
+    ),
+    children: [
+      { index: true, element: <Navigate to="/admin/dashboard" replace /> },
+      { path: "dashboard", element: <AdminDashboardPage /> },
+      { path: "users", element: <AdminUsersPage /> },
+      { path: "restaurants", element: <AdminRestaurantsPage /> },
+      { path: "reviews", element: <AdminReviewsPage /> },
+      { path: "analytics", element: <AdminAnalyticsPage /> },
+    ],
   },
 ]);

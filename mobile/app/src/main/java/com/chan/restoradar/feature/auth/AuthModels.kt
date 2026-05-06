@@ -39,6 +39,6 @@ data class UserDto(
 
 data class AuthData(
     val user: UserDto,
-    val token: String,
+    val accessToken: String,
     val refreshToken: String
 )

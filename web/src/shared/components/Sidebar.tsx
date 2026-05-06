@@ -17,7 +17,7 @@ export function Sidebar() {
 
   const handleLogout = () => {
     logout();
-    navigate("/explore");
+    navigate("/login", { replace: true });
   };
   
   return (
