@@ -1,11 +1,12 @@
 import { useState, useEffect, cloneElement } from "react";
-import { Outlet, useOutletContext, useMatches } from "react-router";
+import { Outlet, useOutletContext, useMatches, Navigate } from "react-router";
 import { Sidebar } from "./shared/components/Sidebar";
 import { MobileBottomNav } from "./shared/components/MobileBottomNav";
 import { MobileHeader } from "./shared/components/MobileHeader";
 import { WelcomeDialog } from "./features/restaurant/WelcomeDialog";
 import { ViewModeIndicator } from "./features/restaurant/ViewModeIndicator";
 import { Toaster } from "./shared/components/ui/sonner";
+import { useAuth } from "./features/auth/AuthContext";
 
 interface RootContextType {
   favorites: string[];
@@ -13,6 +14,8 @@ interface RootContextType {
 }
 
 export function Root() {
+  const { isAuthenticated } = useAuth();
+  
   const [favorites, setFavorites] = useState<string[]>(() => {
     const saved = localStorage.getItem("favorites");
     return saved ? JSON.parse(saved) : ["2", "5"];
@@ -32,6 +35,10 @@ export function Root() {
     favorites,
     onToggleFavorite: handleToggleFavorite,
   };
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
 
   return (
     <div className="flex h-screen overflow-hidden">

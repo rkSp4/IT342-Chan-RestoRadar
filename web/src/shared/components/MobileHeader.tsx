@@ -13,7 +13,7 @@ export function MobileHeader() {
   const handleLogout = () => {
     logout();
     setIsMenuOpen(false);
-    navigate("/");
+    navigate("/login", { replace: true });
   };
 
   return (

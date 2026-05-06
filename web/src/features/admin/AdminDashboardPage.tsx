@@ -9,7 +9,7 @@ import {
   TrendingDown,
   DollarSign
 } from "lucide-react";
-import { mockRestaurants, mockReviews } from "../../data/mockData";
+import { mockRestaurants, mockReviews } from "../restaurant/mockData";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
 
 export function AdminDashboardPage() {

@@ -36,7 +36,7 @@ export function ProfilePage() {
 
   const handleLogout = () => {
     logout();
-    navigate("/");
+    navigate("/login", { replace: true });
   };
 
   return (
