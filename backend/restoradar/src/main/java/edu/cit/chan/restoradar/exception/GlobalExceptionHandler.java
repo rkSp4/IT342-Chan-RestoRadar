@@ -54,4 +54,18 @@ public class GlobalExceptionHandler {
         ErrorResponse response = new ErrorResponse(false, null, detail, Instant.now());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFound(ResourceNotFoundException ex) {
+        ErrorResponse.ErrorDetail detail = new ErrorResponse.ErrorDetail("DB-001", ex.getMessage(), null);
+        ErrorResponse response = new ErrorResponse(false, null, detail, Instant.now());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ErrorResponse> handleForbidden(ForbiddenException ex) {
+        ErrorResponse.ErrorDetail detail = new ErrorResponse.ErrorDetail("AUTH-003", ex.getMessage(), null);
+        ErrorResponse response = new ErrorResponse(false, null, detail, Instant.now());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
 }

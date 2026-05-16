@@ -1,7 +1,6 @@
 package edu.cit.chan.restoradar.security;
 
 import edu.cit.chan.restoradar.service.JwtService;
-import edu.cit.chan.restoradar.service.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

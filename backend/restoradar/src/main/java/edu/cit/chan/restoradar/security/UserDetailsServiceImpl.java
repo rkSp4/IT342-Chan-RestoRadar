@@ -1,4 +1,4 @@
-package edu.cit.chan.restoradar.service;
+package edu.cit.chan.restoradar.security;
 
 import edu.cit.chan.restoradar.entity.UserEntity;
 import edu.cit.chan.restoradar.repository.UserRepository;
