@@ -53,4 +53,6 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, UUID> {
         @Param("priceRange") String priceRange,
         Pageable pageable
     );
+
+    Page<Restaurant> findByApprovedFalse(Pageable pageable);
 }
