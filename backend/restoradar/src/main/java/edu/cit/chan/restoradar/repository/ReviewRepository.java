@@ -29,4 +29,6 @@ public interface ReviewRepository extends JpaRepository<Review, UUID> {
 
     @Query("SELECT COUNT(r) FROM Review r WHERE r.restaurant.id = :restaurantId")
     int countByRestaurantId(@Param("restaurantId") UUID restaurantId);
+
+    int countByUserId(UUID userId);
 }

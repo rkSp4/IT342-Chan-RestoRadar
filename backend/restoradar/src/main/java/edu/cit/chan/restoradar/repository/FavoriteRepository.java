@@ -17,4 +17,6 @@ public interface FavoriteRepository extends JpaRepository<Favorite, UUID> {
     Optional<Favorite> findByUserIdAndRestaurantId(UUID userId, UUID restaurantId);
 
     boolean existsByUserIdAndRestaurantId(UUID userId, UUID restaurantId);
+
+    int countByUserId(UUID userId);
 }
