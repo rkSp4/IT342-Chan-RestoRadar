@@ -8,8 +8,11 @@ import edu.cit.chan.restoradar.feature.user.UserEntity;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import lombok.*;
+
 @Entity
 @Table(name = "refresh_tokens")
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class RefreshTokenEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -27,29 +30,4 @@ public class RefreshTokenEntity {
 
     @CreationTimestamp
     private LocalDateTime createdAt;
-
-    public RefreshTokenEntity() {}
-
-    public RefreshTokenEntity(UUID id, UserEntity user, String token, LocalDateTime expiresAt, LocalDateTime createdAt) {
-        this.id = id;
-        this.user = user;
-        this.token = token;
-        this.expiresAt = expiresAt;
-        this.createdAt = createdAt;
-    }
-
-    public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
-
-    public UserEntity getUser() { return user; }
-    public void setUser(UserEntity user) { this.user = user; }
-
-    public String getToken() { return token; }
-    public void setToken(String token) { this.token = token; }
-
-    public LocalDateTime getExpiresAt() { return expiresAt; }
-    public void setExpiresAt(LocalDateTime expiresAt) { this.expiresAt = expiresAt; }
-
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }
