@@ -1,4 +1,4 @@
-package edu.cit.chan.restoradar.exception;
+package edu.cit.chan.restoradar.shared.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
