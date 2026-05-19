@@ -45,7 +45,7 @@ export const router = createBrowserRouter([
     element: <RegisterPage />,
   },
   {
-    path: "/oauth/callback",
+    path: "/auth/callback",
     element: <OAuthCallbackPage />,
   },
   {
