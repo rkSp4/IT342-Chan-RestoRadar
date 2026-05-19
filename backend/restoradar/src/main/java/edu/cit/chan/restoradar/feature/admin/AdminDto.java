@@ -15,7 +15,7 @@ public class AdminDto {
         private String email;
         private String fullName;
         private String role;
-        private LocalDateTime joinDate;
+        private java.time.LocalDateTime joinDate;
         private int reviewCount;
         private int favoriteCount;
     }
@@ -27,7 +27,7 @@ public class AdminDto {
         private String address;
         private Double averageRating;
         private Integer reviewCount;
-        private LocalDateTime createdAt;
+        private java.time.Instant createdAt;
     }
 
     @Getter @Setter @NoArgsConstructor @AllArgsConstructor

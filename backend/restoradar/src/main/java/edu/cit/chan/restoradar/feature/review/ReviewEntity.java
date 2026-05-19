@@ -1,15 +1,21 @@
 package edu.cit.chan.restoradar.feature.review;
 
+import edu.cit.chan.restoradar.feature.user.UserEntity;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import edu.cit.chan.restoradar.feature.restaurant.RestaurantEntity;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
+import lombok.*;
 
 @Entity
-@Table(name = "reviews")
+@Table(name = "reviews",
+       uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "restaurant_id"}))
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class ReviewEntity {
 
     @Id
@@ -17,38 +23,29 @@ public class ReviewEntity {
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id", nullable = false)
     private RestaurantEntity restaurant;
 
     @Column(nullable = false)
-    private int rating; // e.g. 1 to 5
+    private Integer rating;
 
     @Column(columnDefinition = "TEXT")
     private String comment;
 
+    @ElementCollection
+    @CollectionTable(name = "review_photos", joinColumns = @JoinColumn(name = "review_id"))
+    @Column(name = "photo_url")
+    private List<String> photos;
+
     @CreationTimestamp
-    private LocalDateTime createdAt;
-    
-    public ReviewEntity() {}
+    @Column(name = "created_at", updatable = false)
+    private Instant createdAt;
 
-    public ReviewEntity(RestaurantEntity restaurant, int rating, String comment) {
-        this.restaurant = restaurant;
-        this.rating = rating;
-        this.comment = comment;
-    }
-
-    public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
-
-    public RestaurantEntity getRestaurant() { return restaurant; }
-    public void setRestaurant(RestaurantEntity restaurant) { this.restaurant = restaurant; }
-
-    public int getrating() { return rating; }
-    public void setrating(int rating) { this.rating = rating; }
-
-    public String getComment() { return comment; }
-    public void setComment(String comment) { this.comment = comment; }
-
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private Instant updatedAt;
 }

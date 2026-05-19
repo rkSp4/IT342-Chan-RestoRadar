@@ -20,11 +20,16 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const API_BASE = "/api/v1/auth";
+const API_BASE = `${import.meta.env.VITE_API_URL}/auth`;
+
+// Token keys — used consistently across AuthContext and api.ts
+export const TOKEN_KEY = "restoradar_access_token";
+export const REFRESH_TOKEN_KEY = "restoradar_refresh_token";
+export const USER_KEY = "restoradar_user";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(() => {
-    const savedUser = localStorage.getItem("restoradar_user");
+    const savedUser = localStorage.getItem(USER_KEY);
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
@@ -32,11 +37,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (user) {
-      localStorage.setItem("restoradar_user", JSON.stringify(user));
+      localStorage.setItem(USER_KEY, JSON.stringify(user));
     } else {
-      localStorage.removeItem("restoradar_user");
-      localStorage.removeItem("restoradar_access_token");
-      localStorage.removeItem("restoradar_refresh_token");
+      localStorage.removeItem(USER_KEY);
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(REFRESH_TOKEN_KEY);
     }
   }, [user]);
 
@@ -48,61 +53,77 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
-      console.log("Full login response:", data);
+      const json = await response.json();
 
       if (!response.ok) {
-        return { success: false, error: data.error?.message || "Invalid email or password" };
+        return { success: false, error: json.error?.message || "Invalid email or password" };
       }
 
-      localStorage.setItem("restoradar_access_token", data.accessToken);
-      localStorage.setItem("restoradar_refresh_token", data.refreshToken);
-      setUser(data.user);
+      // Backend wraps response: { success, data: { user, token, refreshToken } }
+      const { user: authUser, accessToken, refreshToken } = json;
+
+      if (!accessToken || !authUser) {
+        return { success: false, error: json.error?.message || "Registration failed" };
+      }
+
+      localStorage.setItem(TOKEN_KEY, accessToken);
+      localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+      setUser(authUser);
       return { success: true };
-    } catch (error) {
+    } catch {
       return { success: false, error: "Network error. Please try again." };
     }
   };
 
-  const register = async (name: string, email: string, password: string, confirmPassword: string): Promise<{ success: boolean; error?: string }> => {
+  const register = async (
+    name: string,
+    email: string,
+    password: string,
+    confirmPassword: string
+  ): Promise<{ success: boolean; error?: string }> => {
     try {
       const response = await fetch(`${API_BASE}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          fullName: name, 
-          email, 
-          password,
-          confirmPassword 
-        }),
+        body: JSON.stringify({ fullName: name, email, password, confirmPassword }),
       });
 
-      const data = await response.json();
+      const json = await response.json();
 
       if (!response.ok) {
-        return { success: false, error: data.error?.message || "Registration failed" };
+        return { success: false, error: json.error?.message || "Registration failed" };
       }
 
-      localStorage.setItem("restoradar_access_token", data.accessToken);
-      localStorage.setItem("restoradar_refresh_token", data.refreshToken);
-      setUser(data.user);
+      const { user: authUser, accessToken, refreshToken } = json;
+
+      if (!accessToken || !authUser) {
+        return { success: false, error: json.error?.message || "Registration failed" };
+      }
+
+      localStorage.setItem(TOKEN_KEY, accessToken);
+      localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+      setUser(authUser);
       return { success: true };
-    } catch (error) {
+    } catch {
       return { success: false, error: "Network error. Please try again." };
     }
   };
 
   const logout = () => {
+    // Fire and forget — don't block UI on logout API call
+    fetch(`${API_BASE}/logout`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem(TOKEN_KEY)}`,
+      },
+    }).catch(() => {});
+
     setUser(null);
-    localStorage.removeItem("restoradar_access_token");
-    localStorage.removeItem("restoradar_refresh_token");
-    localStorage.removeItem("restoradar_user");
   };
 
   const updateProfile = (updates: Partial<User>) => {
     if (user) {
-      const updatedUser = { ...user, ...updates };
-      setUser(updatedUser);
+      setUser({ ...user, ...updates });
     }
   };
 

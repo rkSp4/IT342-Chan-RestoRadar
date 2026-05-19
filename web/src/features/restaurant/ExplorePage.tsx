@@ -1,5 +1,4 @@
-import { useState, useMemo } from "react";
-import { mockRestaurants } from "../restaurant/mockData";
+import { useState, useEffect, useCallback } from "react";
 import { RestaurantCard } from "../../features/restaurant/RestaurantCard";
 import { SearchBar } from "../../features/restaurant/SearchBar";
 import { FilterBar } from "../../features/restaurant/FilterBar";
@@ -7,31 +6,58 @@ import { SlidersHorizontal } from "lucide-react";
 import { Button } from "../../shared/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "../../shared/components/ui/sheet";
 import { useRootContext } from "../../Root";
+import { restaurantService, Restaurant } from "../../shared/services/restaurantService";
 
 export function ExplorePage() {
   const rootContext = useRootContext();
   if (!rootContext) return null;
   const { favorites, onToggleFavorite } = rootContext;
+
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCuisine, setSelectedCuisine] = useState("All");
   const [selectedPriceRange, setSelectedPriceRange] = useState("All");
 
-  const filteredRestaurants = useMemo(() => {
-    return mockRestaurants.filter((restaurant) => {
-      const matchesSearch =
-        restaurant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        restaurant.cuisine.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        restaurant.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+  const fetchRestaurants = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      let result;
+      if (searchQuery.trim()) {
+        result = await restaurantService.search(searchQuery);
+      } else {
+        result = await restaurantService.getAll();
+      }
+      setRestaurants(result.restaurants);
+    } catch {
+      setError("Failed to load restaurants. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }, [searchQuery]);
 
-      const matchesCuisine =
-        selectedCuisine === "All" || restaurant.cuisine === selectedCuisine;
+  // Debounce search — only fire after user stops typing for 400ms
+  useEffect(() => {
+    const timer = setTimeout(fetchRestaurants, 400);
+    return () => clearTimeout(timer);
+  }, [fetchRestaurants]);
 
-      const matchesPrice =
-        selectedPriceRange === "All" || restaurant.priceRange === selectedPriceRange;
+  // Filter locally by cuisine and price range (fast, no extra API call)
+  const filteredRestaurants = restaurants.filter((r) => {
+    const matchesCuisine =
+      selectedCuisine === "All" || r.cuisineType === selectedCuisine;
+    const matchesPrice =
+      selectedPriceRange === "All" || r.priceRange === selectedPriceRange;
+    return matchesCuisine && matchesPrice;
+  });
 
-      return matchesSearch && matchesCuisine && matchesPrice;
-    });
-  }, [searchQuery, selectedCuisine, selectedPriceRange]);
+  const clearFilters = () => {
+    setSearchQuery("");
+    setSelectedCuisine("All");
+    setSelectedPriceRange("All");
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -54,7 +80,7 @@ export function ExplorePage() {
               <SearchBar
                 value={searchQuery}
                 onChange={setSearchQuery}
-                placeholder="Search restaurants, cuisines, or tags..."
+                placeholder="Search restaurants, cuisines..."
               />
             </div>
           </div>
@@ -95,40 +121,56 @@ export function ExplorePage() {
           </Sheet>
         </div>
 
-        {/* Results Count */}
-        <div className="mb-4">
-          <p className="text-gray-600">
-            {filteredRestaurants.length} restaurant{filteredRestaurants.length !== 1 ? 's' : ''} found
-          </p>
-        </div>
+        {/* Loading */}
+        {loading && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="bg-white rounded-xl h-64 animate-pulse" />
+            ))}
+          </div>
+        )}
 
-        {/* Restaurant Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredRestaurants.map((restaurant) => (
-            <RestaurantCard
-              key={restaurant.id}
-              restaurant={restaurant}
-              isFavorite={favorites.includes(restaurant.id)}
-              onToggleFavorite={onToggleFavorite}
-            />
-          ))}
-        </div>
-
-        {filteredRestaurants.length === 0 && (
+        {/* Error */}
+        {error && !loading && (
           <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">No restaurants found matching your criteria</p>
-            <Button
-              variant="link"
-              onClick={() => {
-                setSearchQuery("");
-                setSelectedCuisine("All");
-                setSelectedPriceRange("All");
-              }}
-              className="mt-4"
-            >
-              Clear all filters
+            <p className="text-red-500 text-lg">{error}</p>
+            <Button variant="link" onClick={fetchRestaurants} className="mt-4">
+              Try again
             </Button>
           </div>
+        )}
+
+        {/* Results */}
+        {!loading && !error && (
+          <>
+            <div className="mb-4">
+              <p className="text-gray-600">
+                {filteredRestaurants.length} restaurant{filteredRestaurants.length !== 1 ? "s" : ""} found
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredRestaurants.map((restaurant) => (
+                <RestaurantCard
+                  key={restaurant.id}
+                  restaurant={restaurant}
+                  isFavorite={favorites.includes(restaurant.id)}
+                  onToggleFavorite={onToggleFavorite}
+                />
+              ))}
+            </div>
+
+            {filteredRestaurants.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-gray-500 text-lg">
+                  No restaurants found matching your criteria
+                </p>
+                <Button variant="link" onClick={clearFilters} className="mt-4">
+                  Clear all filters
+                </Button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

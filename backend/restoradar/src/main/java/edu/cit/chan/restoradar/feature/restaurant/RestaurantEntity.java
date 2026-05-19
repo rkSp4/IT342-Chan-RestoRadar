@@ -1,30 +1,36 @@
 package edu.cit.chan.restoradar.feature.restaurant;
 
+import edu.cit.chan.restoradar.feature.user.UserEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Table(name = "restaurants")
-@Data @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class RestaurantEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    // Required fields
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    // "P", "PP", "PPP"
+    @Column(name = "price_range", nullable = false)
+    private String priceRange;
+
+    private String cuisineType;
+
     private String address;
 
     @Column(nullable = false)
@@ -33,26 +39,42 @@ public class RestaurantEntity {
     @Column(nullable = false)
     private Double longitude;
 
-    // Optional fields
-    private String website;
+    @Column(name = "contact_number")
     private String contactNumber;
+
+    private String website;
+
+    // Stored as JSON string: {"monday":"11:00-22:00", ...}
+    @Column(name = "operating_hours", columnDefinition = "TEXT")
     private String operatingHours;
-    private String cuisineType;
-    private String priceRange;
-    private String photos;
-    
-    @Column(nullable = false)
+
+    @Column(name = "average_rating", nullable = false)
     private Double averageRating = 0.0;
-    
-    @Column(nullable = false)
-    private Integer reviewCount = 0;
-
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
 
     @Transient
-    private Double distance; // Transient field for computing distance on the fly
+    private Double distance;
+
+    @Column(name = "review_count", nullable = false)
+    private Integer reviewCount = 0;
+
+    // Stored as comma-separated URLs (or use @ElementCollection for a join table)
+    @ElementCollection
+    @CollectionTable(name = "restaurant_photos", joinColumns = @JoinColumn(name = "restaurant_id"))
+    @Column(name = "photo_url")
+    private List<String> photos;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id")
+    private UserEntity owner;
+
+    @Column(nullable = false)
+    private Boolean approved = false;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private Instant createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private Instant updatedAt;
 }

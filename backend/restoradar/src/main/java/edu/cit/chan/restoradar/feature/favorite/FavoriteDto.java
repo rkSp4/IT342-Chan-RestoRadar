@@ -23,6 +23,6 @@ public class FavoriteDto {
         private String restaurantPriceRange;
         private Double restaurantRating;
         private String restaurantImageUrl;
-        private LocalDateTime createdAt;
+        private java.time.Instant createdAt;
     }
 }

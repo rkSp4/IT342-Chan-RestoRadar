@@ -1,17 +1,17 @@
-// ── FavoriteEntity.java ───────────────────────────────────────────────────────
 package edu.cit.chan.restoradar.feature.favorite;
 
-import edu.cit.chan.restoradar.feature.restaurant.RestaurantEntity;
 import edu.cit.chan.restoradar.feature.user.UserEntity;
 import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
 @Table(name = "favorites",
        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "restaurant_id"}))
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class FavoriteEntity {
 
     @Id
@@ -24,22 +24,9 @@ public class FavoriteEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id", nullable = false)
-    private RestaurantEntity restaurant;
+    private edu.cit.chan.restoradar.feature.restaurant.RestaurantEntity restaurant;
 
     @CreationTimestamp
-    private LocalDateTime createdAt;
-
-    public FavoriteEntity() {}
-
-    public FavoriteEntity(UserEntity user, RestaurantEntity restaurant) {
-        this.user = user;
-        this.restaurant = restaurant;
-    }
-
-    public UUID getId() { return id; }
-    public UserEntity getUser() { return user; }
-    public void setUser(UserEntity user) { this.user = user; }
-    public RestaurantEntity getRestaurant() { return restaurant; }
-    public void setRestaurant(RestaurantEntity restaurant) { this.restaurant = restaurant; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
+    @Column(name = "created_at", updatable = false)
+    private Instant createdAt;
 }

@@ -52,7 +52,10 @@ public class FavoriteService {
             throw new ForbiddenException("Restaurant is already in your favorites");
         }
 
-        return toResponse(favoriteRepository.save(new FavoriteEntity(user, restaurant)));
+        FavoriteEntity favorite = new FavoriteEntity();
+        favorite.setUser(user);
+        favorite.setRestaurant(restaurant);
+        return toResponse(favoriteRepository.save(favorite));
     }
 
     // ── DELETE /favorites/{restaurantId} ──────────────────────────────────────
