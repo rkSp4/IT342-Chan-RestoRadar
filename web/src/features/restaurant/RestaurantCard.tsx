@@ -1,5 +1,5 @@
-import { Heart, MapPin, Clock } from "lucide-react";
-import type { Restaurant } from "../../features/restaurant/restaurant";
+import { Heart, MapPin } from "lucide-react";
+import { Restaurant } from "../../shared/services/restaurantService";
 import { StarRating } from "../../features/review/StarRating";
 import { Link } from "react-router";
 import { ImageWithFallback } from "../../shared/components/figma/ImageWithFallback";
@@ -13,14 +13,14 @@ interface RestaurantCardProps {
 export function RestaurantCard({
   restaurant,
   isFavorite = false,
-  onToggleFavorite
+  onToggleFavorite,
 }: RestaurantCardProps) {
   return (
     <Link to={`/restaurant/${restaurant.id}`} className="block">
       <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
         <div className="relative h-48">
           <ImageWithFallback
-            src={restaurant.image}
+            src={restaurant.photos ?? ""}
             alt={restaurant.name}
             className="w-full h-full object-cover"
           />
@@ -36,44 +36,36 @@ export function RestaurantCard({
               className={isFavorite ? "text-red-500 fill-red-500" : "text-gray-600"}
             />
           </button>
-          <div className="absolute bottom-3 left-3 bg-white px-2 py-1 rounded-md text-sm">
-            {restaurant.priceRange}
-          </div>
+          {restaurant.priceRange && (
+            <div className="absolute bottom-3 left-3 bg-white px-2 py-1 rounded-md text-sm">
+              {restaurant.priceRange}
+            </div>
+          )}
         </div>
-        
+
         <div className="p-4">
           <div className="flex items-start justify-between mb-2">
             <div className="flex-1">
               <h3 className="font-semibold text-lg mb-1">{restaurant.name}</h3>
-              <p className="text-sm text-gray-600">{restaurant.cuisine}</p>
+              {restaurant.cuisineType && (
+                <p className="text-sm text-gray-600">{restaurant.cuisineType}</p>
+              )}
             </div>
           </div>
-          
+
           <div className="flex items-center gap-2 mb-3">
-            <StarRating rating={restaurant.rating} size={16} showNumber />
+            <StarRating rating={restaurant.averageRating} size={16} showNumber />
             <span className="text-sm text-gray-500">({restaurant.reviewCount})</span>
           </div>
-          
+
           <div className="flex items-center gap-4 text-sm text-gray-600">
             <div className="flex items-center gap-1">
               <MapPin size={14} />
-              <span>{restaurant.distance} mi</span>
+              <span className="truncate max-w-[180px]">{restaurant.address}</span>
             </div>
-            <div className="flex items-center gap-1">
-              <Clock size={14} />
-              <span className="text-green-600">Open</span>
-            </div>
-          </div>
-          
-          <div className="mt-3 flex flex-wrap gap-1">
-            {restaurant.tags.slice(0, 3).map((tag, index) => (
-              <span
-                key={index}
-                className="inline-block px-2 py-1 bg-gray-100 rounded-full text-xs text-gray-700"
-              >
-                {tag}
-              </span>
-            ))}
+            {restaurant.distance !== undefined && (
+              <span>{restaurant.distance} km</span>
+            )}
           </div>
         </div>
       </div>

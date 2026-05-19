@@ -49,7 +49,7 @@ class ReviewServiceTest {
         ReviewEntity result = reviewService.submitReview(restaurantId, 4, "Great food!");
 
         assertNotNull(result);
-        assertEquals(4, result.getrating());
+        assertEquals(4, result.getRating());
         assertEquals("Great food!", result.getComment());
         verify(reviewRepository, times(1)).save(any());
     }
@@ -66,7 +66,7 @@ class ReviewServiceTest {
         ReviewEntity result = reviewService.submitReview(restaurantId, 1, "Very bad.");
 
         assertNotNull(result);
-        assertEquals(1, result.getrating());
+        assertEquals(1, result.getRating());
     }
 
     @Test
@@ -81,7 +81,7 @@ class ReviewServiceTest {
         ReviewEntity result = reviewService.submitReview(restaurantId, 5, "Perfect!");
 
         assertNotNull(result);
-        assertEquals(5, result.getrating());
+        assertEquals(5, result.getRating());
     }
 
     @Test

@@ -39,7 +39,11 @@ public class ReviewService {
                     return restaurantRepository.save(dummy);
                 });
 
-        ReviewEntity review = new ReviewEntity(restaurant, rating, comment);
+        ReviewEntity review = ReviewEntity.builder()
+            .restaurant(restaurant)
+            .rating(rating)
+            .comment(comment)
+            .build();
         review = reviewRepository.save(review);
 
         // Subject notifies all interested Observers

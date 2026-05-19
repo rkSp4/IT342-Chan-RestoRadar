@@ -33,7 +33,7 @@ public class RestaurantDto {
         @Pattern(regexp = "^P{1,3}$", message = "Price range must be P, PP, or PPP")
         private String priceRange;
 
-        private String photos;
+        private java.util.List<String> photos;
     }
 
     @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
@@ -46,7 +46,7 @@ public class RestaurantDto {
         private Double averageRating;
         private Integer reviewCount;
         private Double distance;
-        private String photos;
+        private java.util.List<String> photos;
     }
 
     @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
@@ -63,8 +63,8 @@ public class RestaurantDto {
         private String priceRange;
         private Double averageRating;
         private Integer reviewCount;
-        private String photos;
-        private LocalDateTime createdAt;
-        private LocalDateTime updatedAt;
+        private java.util.List<String> photos;
+        private java.time.Instant createdAt;
+        private java.time.Instant updatedAt;
     }
 }
