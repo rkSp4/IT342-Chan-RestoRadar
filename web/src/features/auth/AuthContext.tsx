@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import { createContext, useContext, useState, ReactNode, useEffect, useCallback } from "react";
 
 export interface User {
   id: string;
@@ -16,6 +16,7 @@ interface AuthContextType {
   register: (name: string, email: string, password: string, confirmPassword: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   updateProfile: (updates: Partial<User>) => void;
+  oauthLogin: (user: User, accessToken: string, refreshToken: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -35,15 +36,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const isAuthenticated = user !== null;
 
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem(USER_KEY, JSON.stringify(user));
-    } else {
-      localStorage.removeItem(USER_KEY);
-      localStorage.removeItem(TOKEN_KEY);
-      localStorage.removeItem(REFRESH_TOKEN_KEY);
-    }
-  }, [user]);
+  const authContextLogin = useCallback((authUser: User, accessToken: string, refreshToken: string) => {
+    localStorage.setItem(TOKEN_KEY, accessToken);
+    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+    localStorage.setItem(USER_KEY, JSON.stringify(authUser));
+    setUser(authUser);
+  }, []);
 
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
@@ -66,9 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { success: false, error: json.error?.message || "Registration failed" };
       }
 
-      localStorage.setItem(TOKEN_KEY, accessToken);
-      localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-      setUser(authUser);
+      authContextLogin(authUser, accessToken, refreshToken);
       return { success: true };
     } catch {
       return { success: false, error: "Network error. Please try again." };
@@ -100,9 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { success: false, error: json.error?.message || "Registration failed" };
       }
 
-      localStorage.setItem(TOKEN_KEY, accessToken);
-      localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-      setUser(authUser);
+      authContextLogin(authUser, accessToken, refreshToken);
       return { success: true };
     } catch {
       return { success: false, error: "Network error. Please try again." };
@@ -118,6 +112,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
     }).catch(() => {});
 
+    localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
     setUser(null);
   };
 
@@ -128,7 +125,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, register, logout, updateProfile }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, login, register, logout, updateProfile, oauthLogin: authContextLogin }}>
       {children}
     </AuthContext.Provider>
   );

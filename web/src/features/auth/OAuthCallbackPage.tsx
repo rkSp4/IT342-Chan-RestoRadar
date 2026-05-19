@@ -1,9 +1,11 @@
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
+import { useAuth } from "./AuthContext";
 
 export function OAuthCallbackPage() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { oauthLogin } = useAuth();
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -15,26 +17,29 @@ export function OAuthCallbackPage() {
     const email = params.get("email");
     const role = params.get("role");
 
+    console.log("OAuth Callback Params:", { accessToken, refreshToken, id, fullName, email, role });
+
     if (!accessToken || !refreshToken || !id || !fullName || !email || !role) {
+      console.error("Missing parameters in OAuth callback URL");
       navigate("/login");
       return;
     }
 
-    localStorage.setItem("restoradar_access_token", accessToken);
-    localStorage.setItem("restoradar_refresh_token", refreshToken);
-    localStorage.setItem(
-      "restoradar_user",
-      JSON.stringify({
+    oauthLogin(
+      {
         id,
         fullName,
         email,
         role,
         createdAt: new Date().toISOString(),
-      })
+      },
+      accessToken,
+      refreshToken
     );
 
-    window.location.replace("/home");
-  }, [location.search, navigate]);
+    navigate("/explore", { replace: true });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.search]);
 
   return (
     <div className="min-h-screen flex items-center justify-center">
