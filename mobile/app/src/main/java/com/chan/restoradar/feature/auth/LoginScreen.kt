@@ -23,7 +23,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun LoginScreen(
-    onLoginSuccess: (token: String, fullName: String) -> Unit,
+    onLoginSuccess: (token: String, user: com.chan.restoradar.shared.data.UserProfile) -> Unit,
     onNavigateToRegister: () -> Unit,
     viewModel: AuthViewModel = viewModel()
 ) {
@@ -45,7 +45,17 @@ fun LoginScreen(
     LaunchedEffect(uiState) {
         if (uiState is AuthUiState.Success) {
             val data = (uiState as AuthUiState.Success).data
-            onLoginSuccess(data.token, data.user.fullName)
+
+            // Map the network UserDto to your updated UserProfile
+            val userProfile = com.chan.restoradar.shared.data.UserProfile(
+                id = data.user.id.toString(),
+                email = data.user.email,
+                fullName = data.user.fullName,
+                role = data.user.role,
+                profileImage = data.user.profileImage
+            )
+
+            onLoginSuccess(data.accessToken, userProfile)
             viewModel.resetState()
         }
     }

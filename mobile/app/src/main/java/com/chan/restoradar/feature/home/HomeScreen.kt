@@ -1,196 +1,202 @@
 package com.chan.restoradar.feature.home
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material.icons.filled.Restaurant
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.chan.restoradar.shared.components.RRFilterChip
+import com.chan.restoradar.shared.components.RestaurantCard
+import com.chan.restoradar.shared.components.SectionLabel
+import com.chan.restoradar.shared.data.FavoriteRequest
+import com.chan.restoradar.shared.data.Restaurant
+import com.chan.restoradar.shared.network.RestoRadarApi
+import com.chan.restoradar.shared.network.RetrofitClient
+import com.chan.restoradar.shared.network.SessionStore
+import com.chan.restoradar.shared.theme.*
+import kotlinx.coroutines.launch
 
-private val BgStart       = Color(0xFFFDF0EA)
-private val BgEnd         = Color(0xFFFAE8E0)
-private val CardBg        = Color(0xFFFFFFFF)
-private val SubtitleColor = Color(0xFF9CA3AF)
-private val LabelColor    = Color(0xFF1A1A1A)
-private val OrangeAccent  = Color(0xFFE8470A)
+private val CUISINE_TYPES = listOf("All", "Italian", "Japanese", "Mexican", "American", "Cafe", "Asian", "Steakhouse", "Vegetarian")
+private val PRICE_RANGES  = listOf("All", "$", "$$", "$$$", "$$$$")
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(
-    fullName: String,
-    email: String,
-    isNewUser: Boolean = false,   // true = came from Register, false = came from Login
-    onSignOut: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Brush.verticalGradient(listOf(BgStart, BgEnd))),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+fun HomeScreen(onRestaurantClick: (String) -> Unit) {
+    val context = LocalContext.current
+    val api     = remember { RetrofitClient.createService(context, RestoRadarApi::class.java) }
+    val scope   = rememberCoroutineScope()
+
+    var restaurants     by remember { mutableStateOf<List<Restaurant>>(emptyList()) }
+    var isLoading       by remember { mutableStateOf(true) }
+    var errorMessage    by remember { mutableStateOf<String?>(null) }
+    var searchQuery     by remember { mutableStateOf("") }
+    var selectedCuisine by remember { mutableStateOf("All") }
+    var selectedPrice   by remember { mutableStateOf("All") }
+    var favoriteIds     by remember { mutableStateOf<Set<String>>(emptySet()) }
+
+    fun load() {
+        scope.launch {
+            isLoading = true
+            errorMessage = null
+            try {
+                val cuisine = if (selectedCuisine == "All") null else selectedCuisine
+                val price   = if (selectedPrice == "All") null else selectedPrice
+                val resp = if (searchQuery.isBlank()) {
+                    api.getRestaurants(cuisineType = cuisine, priceRange = price)
+                } else {
+                    api.searchRestaurants(searchQuery)
+                }
+                if (resp.isSuccessful) restaurants = resp.body() ?: emptyList()
+                else errorMessage = "Failed to load restaurants. Please try again."
+            } catch (e: Exception) {
+                errorMessage = "Failed to load restaurants. Please try again."
+            }
+            isLoading = false
+        }
+    }
+
+    fun loadFavorites() {
+        val userId = SessionStore.getUserId(context) ?: return
+        scope.launch {
+            try {
+                val resp = api.getFavorites(userId)
+                if (resp.isSuccessful) {
+                    favoriteIds = resp.body()?.map { it.restaurantId }?.toSet() ?: emptySet()
+                }
+            } catch (_: Exception) {}
+        }
+    }
+
+    fun toggleFavorite(restaurantId: String) {
+        scope.launch {
+            try {
+                if (restaurantId in favoriteIds) {
+                    api.removeFavorite(restaurantId)
+                    favoriteIds = favoriteIds - restaurantId
+                } else {
+                    api.addFavorite(FavoriteRequest(restaurantId))
+                    favoriteIds = favoriteIds + restaurantId
+                }
+            } catch (_: Exception) {}
+        }
+    }
+
+    LaunchedEffect(Unit) { load(); loadFavorites() }
+    LaunchedEffect(selectedCuisine, selectedPrice) { if (searchQuery.isBlank()) load() }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Discover Restaurants", fontWeight = FontWeight.Bold, fontSize = 20.sp) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = White,
+                    titleContentColor = TextPrimary
+                )
+            )
+        },
+        containerColor = BackgroundPage
+    ) { padding ->
+        LazyColumn(
+            modifier = Modifier.fillMaxSize().padding(padding),
+            contentPadding = PaddingValues(bottom = 16.dp)
         ) {
-            // ── App Icon ──────────────────────────────────────────────────
-            Box(
-                modifier = Modifier
-                    .size(72.dp)
-                    .clip(RoundedCornerShape(18.dp))
-                    .background(
-                        Brush.verticalGradient(listOf(Color(0xFFFF6B35), Color(0xFFE8470A)))
+            item {
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = {
+                        searchQuery = it
+                        if (it.isBlank()) load()
+                    },
+                    placeholder = { Text("Search restaurants, cuisines...", color = TextMuted) },
+                    leadingIcon = { Icon(Icons.Filled.Search, null, tint = TextMuted) },
+                    singleLine = true,
+                    shape = RoundedCornerShape(10.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Brand,
+                        unfocusedBorderColor = BorderColor,
+                        focusedContainerColor = White,
+                        unfocusedContainerColor = White
                     ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Restaurant,
-                    contentDescription = "RestoRadar",
-                    tint = Color.White,
-                    modifier = Modifier.size(38.dp)
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                    keyboardActions = KeyboardActions(onSearch = { load() }),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // ── White Card ────────────────────────────────────────────────
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = CardBg),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(horizontal = 28.dp, vertical = 32.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+            item {
+                SectionLabel("Cuisine Type", modifier = Modifier.padding(horizontal = 16.dp))
+                Spacer(Modifier.height(8.dp))
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(
-                        text = "Welcome to RestoRadar",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = LabelColor,
-                        textAlign = TextAlign.Center
-                    )
-
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    if (isNewUser) {
-                        // ── Came from Register ────────────────────────────
-                        Text(
-                            text = "You have registered, ${fullName.split(" ").first()}!",
-                            fontSize = 14.sp,
-                            color = SubtitleColor,
-                            textAlign = TextAlign.Center
-                        )
-
-                        Spacer(modifier = Modifier.height(24.dp))
-
-                        // Green success box
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(14.dp))
-                                .background(Color(0xFFF0FDF4))
-                                .border(1.dp, Color(0xFFBBF7D0), RoundedCornerShape(14.dp))
-                                .padding(vertical = 20.dp, horizontal = 16.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(
-                                    text = "Account created successfully!",
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF16A34A),
-                                    textAlign = TextAlign.Center
-                                )
-                                if (email.isNotBlank()) {
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                    Text(
-                                        text = email,
-                                        fontSize = 14.sp,
-                                        color = Color(0xFF16A34A),
-                                        textAlign = TextAlign.Center
-                                    )
-                                }
-                            }
-                        }
-
-                    } else {
-                        // ── Came from Login ───────────────────────────────
-                        Text(
-                            text = "Homepage coming soon",
-                            fontSize = 14.sp,
-                            color = SubtitleColor,
-                            textAlign = TextAlign.Center
-                        )
-
-                        Spacer(modifier = Modifier.height(24.dp))
-
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(14.dp))
-                                .background(Color(0xFFFFF7ED))
-                                .border(1.dp, Color(0xFFFED7AA), RoundedCornerShape(14.dp))
-                                .padding(vertical = 20.dp, horizontal = 16.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(
-                                    text = "🚧  Under Construction",
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = OrangeAccent,
-                                    textAlign = TextAlign.Center
-                                )
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = "The full homepage is on its way!",
-                                    fontSize = 13.sp,
-                                    color = Color(0xFFB45309),
-                                    textAlign = TextAlign.Center
-                                )
-                            }
-                        }
+                    items(CUISINE_TYPES) { type ->
+                        RRFilterChip(label = type, selected = selectedCuisine == type, onClick = { selectedCuisine = type })
                     }
+                }
+                Spacer(Modifier.height(12.dp))
+            }
 
-                    Spacer(modifier = Modifier.height(24.dp))
+            item {
+                SectionLabel("Price Range", modifier = Modifier.padding(horizontal = 16.dp))
+                Spacer(Modifier.height(8.dp))
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(PRICE_RANGES) { price ->
+                        RRFilterChip(label = price, selected = selectedPrice == price, onClick = { selectedPrice = price })
+                    }
+                }
+                Spacer(Modifier.height(16.dp))
+            }
 
-                    // ── Sign Out Button ───────────────────────────────────
-                    OutlinedButton(
-                        onClick = onSignOut,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(52.dp),
-                        shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = LabelColor
-                        )
+            when {
+                isLoading -> item {
+                    Box(Modifier.fillMaxWidth().padding(48.dp), Alignment.Center) {
+                        CircularProgressIndicator(color = Brand)
+                    }
+                }
+                errorMessage != null -> item {
+                    Column(
+                        Modifier.fillMaxWidth().padding(48.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                            contentDescription = "Sign Out",
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            "Sign Out",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium
-                        )
+                        Text(errorMessage!!, color = ErrorRed, fontSize = 14.sp)
+                        Spacer(Modifier.height(12.dp))
+                        TextButton(onClick = ::load) {
+                            Text("Try again", color = TextPrimary, fontWeight = FontWeight.Medium)
+                        }
                     }
+                }
+                restaurants.isEmpty() -> item {
+                    Box(Modifier.fillMaxWidth().padding(48.dp), Alignment.Center) {
+                        Text("No restaurants found.", color = TextMuted, fontSize = 14.sp)
+                    }
+                }
+                else -> items(restaurants) { restaurant ->
+                    RestaurantCard(
+                        restaurant = restaurant,
+                        isFavorite = restaurant.id in favoriteIds,
+                        onFavoriteToggle = { toggleFavorite(restaurant.id) },
+                        onClick = { onRestaurantClick(restaurant.id) },
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
+                    )
                 }
             }
         }

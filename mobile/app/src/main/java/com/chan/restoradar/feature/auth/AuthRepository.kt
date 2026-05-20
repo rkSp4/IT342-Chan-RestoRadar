@@ -32,7 +32,7 @@ class AuthRepository {
                     AuthResult.Success(
                         AuthData(
                             user = body.user,
-                            token = body.accessToken,
+                            accessToken = body.accessToken,
                             refreshToken = body.refreshToken
                         )
                     )
@@ -62,7 +62,7 @@ class AuthRepository {
                     AuthResult.Success(
                         AuthData(
                             user = body.user,
-                            token = body.accessToken,
+                            accessToken = body.accessToken,
                             refreshToken = body.refreshToken
                         )
                     )

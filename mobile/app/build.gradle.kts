@@ -91,4 +91,13 @@ dependencies {
 
     // Debug
     debugImplementation("androidx.compose.ui:ui-tooling")
+
+    // Image loading (restaurant photos)
+    implementation("io.coil-kt:coil-compose:2.6.0")
+
+    // OSM map (no API key needed)
+    implementation("org.osmdroid:osmdroid-android:6.1.18")
+
+    // GPS / Fused Location
+    implementation("com.google.android.gms:play-services-location:21.2.0")
 }
