@@ -36,7 +36,7 @@ private val ErrorColor    = Color(0xFFDC2626)
 
 @Composable
 fun RegisterScreen(
-    onRegisterSuccess: (token: String, fullName: String) -> Unit,
+    onRegisterSuccess: (token: String, user: com.chan.restoradar.shared.data.UserProfile) -> Unit,
     onNavigateToLogin: () -> Unit,
     viewModel: AuthViewModel = viewModel()
 ) {
@@ -52,7 +52,17 @@ fun RegisterScreen(
     LaunchedEffect(uiState) {
         if (uiState is AuthUiState.Success) {
             val data = (uiState as AuthUiState.Success).data
-            onRegisterSuccess(data.token, data.user.fullName)
+
+            // Map the network UserDto to your updated UserProfile
+            val userProfile = com.chan.restoradar.shared.data.UserProfile(
+                id = data.user.id.toString(),
+                email = data.user.email,
+                fullName = data.user.fullName,
+                role = data.user.role,
+                profileImage = data.user.profileImage
+            )
+
+            onRegisterSuccess(data.accessToken, userProfile)
             viewModel.resetState()
         }
     }
